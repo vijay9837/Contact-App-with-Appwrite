@@ -7,5 +7,5 @@ export default defineConfig({
   plugins: [react(),
     tailwindcss()
   ],
-  base : "/contact-app"
+  base: "/Contact-App-with-Appwrite/",
 })
