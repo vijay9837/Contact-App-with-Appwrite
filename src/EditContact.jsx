@@ -55,49 +55,44 @@ function EditContact() {
   };
 
   return isEditActive ? (
-    <div className="w-full h-full bg-white/10 backdrop-blur-[10px] p-3 absolute z-20 flex flex-col justify-between items-center">
+    <div className="w-full h-full bg-white/10 backdrop-blur-[10px] p-3 absolute top-0 left-0 z-20 flex flex-col justify-between items-center">
       <div className="w-full h-9/10 justify-between flex items-center">
         <form
           onSubmit={updateContact}
-          className="bg-white rounded-[10px] w-full h-auto flex flex-col gap-3 p-4 justify-center items-end"
+          className=" rounded-[10px] w-full h-auto flex flex-col gap-3 p-4 justify-center items-end"
         >
           <button className="">
             <RxCross2
               onClick={setIsEditActive}
-              className="font-bold text-[30px] cursor-pointer"
+              className=" text-red-600 font-bold text-[30px] cursor-pointer"
             />
           </button>
 
           <div className="w-full flex flex-col">
-            <label htmlFor="name" className="w-full">
-              Name
-            </label>
             <input
               onChange={handlechange}
               type="text"
               name="name"
               id="name"
               value={inputvalue.name}
-              className="bg-white p-3 text-black border border-black"
+              className="bg-gray-700 p-3 rounded  outline-none border border-white  text-white "
             />
           </div>
           <div className="flex flex-col w-full">
-            <label htmlFor="email" className="w-full">
-              Email
-            </label>
+
             <input
               onChange={handlechange}
               type="email"
               name="email"
               id="email"
               value={inputvalue.email}
-              className="w-full bg-white p-3 text-black border border-black"
+              className="w-full bg-gray-700 p-3 rounded outline-none border border-white  text-white "
             />
           </div>
           <div className="w-full flex justify-end">
             <button
               type="submit"
-              className="bg-amber-500 px-3 text-[18px] rounded font-bold cursor-pointer py-1"
+              className="bg-amber-500 px-3 text-[18px] w-full text-white rounded font-bold cursor-pointer py-2"
             >
               Edit Contact
             </button>

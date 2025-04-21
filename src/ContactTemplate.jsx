@@ -4,34 +4,41 @@ import { RiEditCircleLine } from "react-icons/ri";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { databases } from "./AppwriteServices/AppwriteServices";
 import { AuthContext } from "./Context";
+import { Query } from "appwrite"; 
+
 
 function ContactTemplate() {
   const [data, setData] = useState(null);
   const [contactDelMessage,SetContactDelMessage] = useState(false)
-  const { isactive ,setId,setIsEditActive ,isEditActive , setSelectedcontact ,refresh ,setRefresh, searchname } = useContext(AuthContext);
+  const { isactive ,setId,setIsEditActive ,isEditActive , setSelectedcontact ,refresh ,setRefresh, searchname ,slug,setSlug } = useContext(AuthContext);
 
-  useEffect(() => {
-    const database = databases;
-    const promise = database.listDocuments(
-      "67fd1d6e002436014227", // Your database ID
-      "67fd1d88000bfae74313" // Your collection ID
-    );
-    promise
-      .then(function (response) {
+
+useEffect(() => {
+  const database = databases;
+  const promise = database.listDocuments(
+    "67fd1d6e002436014227", // database ID
+    "67fd1d88000bfae74313", // collection ID
+    [
+      Query.equal("userId", slug) 
+    ]
+  );
+
+  promise
+    .then(function (response) {
       const documents = response.documents;
       if (searchname) {
         const filteredItems = documents.filter((item) =>
-        item.name.toLowerCase().includes(searchname.toLowerCase())
+          item.name.toLowerCase().includes(searchname.toLowerCase())
         );
         setData(filteredItems);
       } else {
         setData(documents);
       }
-      })
-      .catch(function (error) {
+    })
+    .catch(function (error) {
       console.error("Error listing documents:", error);
-      });
-  }, [isactive, refresh, searchname]); // Add searchname as a dependency
+    });
+}, [isactive, refresh, searchname, slug]); 
 
   const deleteContact = (e) => {
     const id = e.currentTarget.getAttribute("id");
@@ -69,7 +76,7 @@ function ContactTemplate() {
         data.map((item) => (
           <div
             key={item.$id}
-            className="w-9/10 h-3 bg-orange-200 px-2 py-7 flex items-center justify-between rounded "
+            className="w-full h-3 bg-orange-200 px-2 py-7 flex items-center justify-between rounded "
           >
             <VscAccount className="text-orange-500 text-[25px]" />
             <div className="flex flex-col w-6/10 ">

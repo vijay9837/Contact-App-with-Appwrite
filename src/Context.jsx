@@ -4,7 +4,11 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [id, setId] = useState("");
-  const [searchname, setSearchname] = useState("")
+  const [islogin, setIslogin] = useState(null);
+  const [slug, setSlug] = useState("");
+  const [isloginform, setIsloginform] = useState(false);
+  const [issignupform, setIssignupform] = useState(false);
+  const [searchname, setSearchname] = useState("");
   const [inputvalue, setInputvalue] = useState({
     name: "",
     email: "",
@@ -44,7 +48,16 @@ export const AuthProvider = ({ children }) => {
         inputvalue,
         handlechange,
         setSearchname,
-        searchname
+        searchname,
+        islogin,
+        setIslogin,
+        isloginform,
+        setIsloginform,
+        issignupform,
+        setIssignupform,
+        slug,
+        setSlug,
+        setIsactive,
       }}
     >
       {children}
