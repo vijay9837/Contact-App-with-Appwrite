@@ -37,7 +37,7 @@ function Home() {
       .getSession("current")
       .then((res) => {
         setIslogin(res?.userId);
-        setSlug(res?.$id)
+        setSlug(res?.userId)
         setTimeout(() => setApploading(false), 1000)
       })
       .catch((err) => {
@@ -125,7 +125,7 @@ function Home() {
           </div>
           {isactive && <Inputform />}
           {isEditActive && <EditContact />}
-          <ContactTemplate />
+          <ContactTemplate  />
         </div>
       )}
     </div>
