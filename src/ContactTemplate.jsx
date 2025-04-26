@@ -5,6 +5,9 @@ import { MdOutlineDeleteForever } from "react-icons/md";
 import { databases } from "./AppwriteServices/AppwriteServices";
 import { AuthContext } from "./Context";
 import { Query } from "appwrite";
+import { Storage } from "appwrite";
+import { Client } from "appwrite";
+import Message from "./Message";
 
 function ContactTemplate() {
   const [data, setData] = useState(null);
@@ -19,47 +22,67 @@ function ContactTemplate() {
     setRefresh,
     searchname,
     slug,
+    fileurl,
+    setFileurl,
+    contactadd,
   } = useContext(AuthContext);
 
   useEffect(() => {
-    const database = databases;
-    const promise = database.listDocuments(
-      "67fd1d6e002436014227", // database ID
-      "67fd1d88000bfae74313", // collection ID
-      [Query.equal("userId", slug)]
-    );
+    const client = new Client()
+      .setEndpoint("https://cloud.appwrite.io/v1")
+      .setProject("67fd1d1800257211c340");
 
-    promise
-      .then(function (response) {
+    const database = databases;
+    const storage = new Storage(client);
+
+    const fetchData = async () => {
+      try {
+        const response = await database.listDocuments(
+          "67fd1d6e002436014227",
+          "67fd1d88000bfae74313",
+          [Query.equal("userId", slug)]
+        );
+
         const documents = response.documents;
+
+        const updatedDocuments = documents.map((item) => {
+          const fileId = item.profileimage;
+          const fileurl = fileId
+            ? storage.getFileView("6807a26a0007406a2a5b", fileId).href
+            : null;
+
+          return { ...item, fileViewUrl: fileurl };
+        });
+
         if (searchname) {
-          const filteredItems = documents.filter((item) =>
+          const filteredItems = updatedDocuments.filter((item) =>
             item.name.toLowerCase().includes(searchname.toLowerCase())
           );
           setData(filteredItems);
         } else {
-          setData(documents);
+          setData(updatedDocuments);
         }
-      })
-      .catch(function (error) {
+      } catch (error) {
         console.error("Error listing documents:", error);
-      });
-  }, [isactive, refresh, searchname, slug]);
+      }
+    };
+    fetchData();
+  }, [isactive, refresh]);
 
   const deleteContact = (e) => {
     const id = e.currentTarget.getAttribute("id");
     const database = databases;
     const promise = database.deleteDocument(
-      "67fd1d6e002436014227", // Your database ID
-      "67fd1d88000bfae74313", // Your collection ID
+      "67fd1d6e002436014227",
+      "67fd1d88000bfae74313",
       `${id}`
     );
     promise
       .then(() => {
-        setRefresh((prev) => !prev); // Toggle refresh state to trigger re-fetch
-        SetContactDelMessage((prev) => !prev);
+        setRefresh((prev) => !prev);
+        SetContactDelMessage(true);
         setTimeout(() => {
-          SetContactDelMessage((prev) => !prev);
+          SetContactDelMessage(false);
         }, 2000);
       })
       .catch((error) => {
@@ -81,14 +104,22 @@ function ContactTemplate() {
         data.map((item) => (
           <div
             key={item.$id}
-            className="w-full h-3 bg-orange-200 px-2 py-7 flex items-center justify-between rounded "
+            className="w-full bg-orange-200 px-2 py-7 flex items-center justify-between rounded"
           >
-            <VscAccount className="text-orange-500 text-[25px]" />
-            <div className="flex flex-col w-6/10 ">
-              <h2 className="text-[15px] font-bold  text-black ">
-                {item.name}
-              </h2>
-              <p className="text-[12px]  text-black">{item.email}</p>
+            <div className="flex items-center gap-3">
+              {item.profileimage ? (
+                <img
+                  src={item.profileimage}
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full"
+                />
+              ) : (
+                <VscAccount className="w-10 h-10 text-orange-500" />
+              )}
+              <div className="flex flex-col">
+                <h2 className="text-[15px] font-bold text-black">{item.name}</h2>
+                <p className="text-[12px] text-black">{item.email}</p>
+              </div>
             </div>
             <div className="flex gap-1">
               <RiEditCircleLine
@@ -110,31 +141,12 @@ function ContactTemplate() {
         </div>
       )}
 
-      {contactDelMessage ? (
-        <div className="w-full h-auto rounded flex flex-col justify-between absolute bottom-0 gap-2 bg-red-200 p-2 ">
-          <h1 className="text-[20px] text-center font-bold">
-            Contact Deleted Successfully...
-          </h1>
-          <div
-            className="w-full h-[5px] bg-red-500 "
-            style={{
-              animation: "shrinkWidth 2s linear forwards",
-            }}
-          ></div>
-        </div>
-      ) : null}
-      <style>
-        {`
-          @keyframes shrinkWidth {
-            from {
-              width: 100%;
-            }
-            to {
-              width: 0%;
-            }
-          }
-        `}
-      </style>
+      {contactDelMessage && (
+        <Message children={`Contact Deleted SuccesFully...`}/>
+      )}
+      {contactadd && (
+        <Message children={`Contact Added SuccesFully...`} bgColor = 'bg-green-500/30' borderColor = 'border-green-500'/>
+      )}
     </div>
   ) : (
     <div className="w-full text-white font-bold text-center">Loading...</div>
